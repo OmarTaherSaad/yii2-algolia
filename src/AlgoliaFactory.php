@@ -2,7 +2,8 @@
 
 namespace leinonen\Yii2Algolia;
 
-use AlgoliaSearch\Client;
+use Algolia\AlgoliaSearch\Config\SearchConfig;
+use Algolia\AlgoliaSearch\SearchClient;
 use leinonen\Yii2Algolia\ActiveRecord\ActiveQueryChunker;
 use leinonen\Yii2Algolia\ActiveRecord\ActiveRecordFactory;
 
@@ -19,13 +20,10 @@ class AlgoliaFactory
      */
     public function make(AlgoliaConfig $config)
     {
+        $searchConfig = SearchConfig::create($config->getApplicationId(), $config->getApiKey());
+        $searchConfig->setHosts($config->getHostsArray());
         return new AlgoliaManager(
-            new Client(
-                $config->getApplicationId(),
-                $config->getApiKey(),
-                $config->getHostsArray(),
-                $config->getOptions()
-            ),
+            SearchClient::createWithConfig($searchConfig),
             new ActiveRecordFactory(),
             new ActiveQueryChunker()
         );
@@ -42,7 +40,7 @@ class AlgoliaFactory
      */
     public function makeSearchableObject($className)
     {
-        if (! (new \ReflectionClass($className))->implementsInterface(SearchableInterface::class)) {
+        if (!(new \ReflectionClass($className))->implementsInterface(SearchableInterface::class)) {
             throw new \InvalidArgumentException("Cannot initiate a class ({$className}) which doesn't implement leinonen\\Yii2Algolia\\SearchableInterface");
         }
 

@@ -4,13 +4,13 @@ namespace leinonen\Yii2Algolia\Tests\Unit\ActiveRecord;
 
 use Yii;
 use Mockery as m;
-use yiiunit\TestCase;
 use yii\db\ActiveRecord;
 use leinonen\Yii2Algolia\AlgoliaManager;
 use leinonen\Yii2Algolia\AlgoliaComponent;
 use leinonen\Yii2Algolia\Tests\Helpers\DummyActiveRecordModel;
 use leinonen\Yii2Algolia\ActiveRecord\SynchronousAutoIndexBehavior;
 use leinonen\Yii2Algolia\Tests\Helpers\SynchronousAutoIndexedDummyModel;
+use leinonen\Yii2Algolia\Tests\Unit\TestCase;
 
 class SynchronousAutoIndexBehaviorTest extends TestCase
 {
@@ -19,7 +19,7 @@ class SynchronousAutoIndexBehaviorTest extends TestCase
      */
     private $dummyAlgoliaManager;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->mockWebApplication([
@@ -40,14 +40,14 @@ class SynchronousAutoIndexBehaviorTest extends TestCase
         });
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
         parent::tearDown();
     }
 
     /** @test */
-    public function it_should_call_push_to_indices_method_from_algolia_manager_when_the_owner_is_saved()
+    public function test_it_should_call_push_to_indices_method_from_algolia_manager_when_the_owner_is_saved()
     {
         $dummyModel = new SynchronousAutoIndexedDummyModel();
         $this->dummyAlgoliaManager->shouldReceive('pushToIndices')->once()->with($dummyModel);
@@ -56,7 +56,7 @@ class SynchronousAutoIndexBehaviorTest extends TestCase
     }
 
     /** @test */
-    public function it_should_call_remove_from_indices_method_from_algolia_manager_when_the_owner_deleted()
+    public function test_it_should_call_remove_from_indices_method_from_algolia_manager_when_the_owner_deleted()
     {
         $dummyModel = new SynchronousAutoIndexedDummyModel();
         $this->dummyAlgoliaManager->shouldReceive('removeFromIndices')->once()->with($dummyModel);
@@ -65,7 +65,7 @@ class SynchronousAutoIndexBehaviorTest extends TestCase
     }
 
     /** @test */
-    public function it_should_call_update_in_indices_method_from_algolia_manager_when_the_owner_updated()
+    public function test_it_should_call_update_in_indices_method_from_algolia_manager_when_the_owner_updated()
     {
         $dummyModel = new SynchronousAutoIndexedDummyModel();
         $this->dummyAlgoliaManager->shouldReceive('updateInIndices')->once()->with($dummyModel);
@@ -74,7 +74,7 @@ class SynchronousAutoIndexBehaviorTest extends TestCase
     }
 
     /** @test */
-    public function it_should_not_call_push_to_indices_if_afterInsert_is_set_to_false()
+    public function test_it_should_not_call_push_to_indices_if_afterInsert_is_set_to_false()
     {
         $dummyModel = new DummyActiveRecordModel();
         $dummyModel->attachBehavior('test', [
@@ -88,7 +88,7 @@ class SynchronousAutoIndexBehaviorTest extends TestCase
     }
 
     /** @test */
-    public function it_should_not_call_remove_from_indices_if_afterDelete_is_set_to_false()
+    public function test_it_should_not_call_remove_from_indices_if_afterDelete_is_set_to_false()
     {
         $dummyModel = new DummyActiveRecordModel();
         $dummyModel->attachBehavior('test', [
@@ -102,7 +102,7 @@ class SynchronousAutoIndexBehaviorTest extends TestCase
     }
 
     /** @test */
-    public function it_should_not_call_remove_from_indices_if_afterUpdate_is_set_to_false()
+    public function test_it_should_not_call_remove_from_indices_if_afterUpdate_is_set_to_false()
     {
         $dummyModel = new DummyActiveRecordModel();
         $dummyModel->attachBehavior('test', [

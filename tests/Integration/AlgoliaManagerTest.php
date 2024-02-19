@@ -17,7 +17,7 @@ class AlgoliaManagerTest extends TestCase
      */
     private $algoliaManager;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -25,7 +25,7 @@ class AlgoliaManagerTest extends TestCase
     }
 
     /** @test */
-    public function it_can_index_an_searchable_object()
+    public function test_it_can_index_an_searchable_object()
     {
         $index = $this->createDummyObjectToIndex();
         $searchResult = $index->search('otherProperty');
@@ -35,7 +35,7 @@ class AlgoliaManagerTest extends TestCase
     }
 
     /** @test */
-    public function it_can_index_multiple_objects_in_a_batch()
+    public function test_it_can_index_multiple_objects_in_a_batch()
     {
         $dummyModel1 = $this->makeDummyModel(1);
         $dummyModel2 = $this->makeDummyModel(2);
@@ -56,7 +56,7 @@ class AlgoliaManagerTest extends TestCase
     }
 
     /** @test */
-    public function it_can_update_an_existing_searchable_object()
+    public function test_it_can_update_an_existing_searchable_object()
     {
         $objectId = 1;
 
@@ -78,7 +78,7 @@ class AlgoliaManagerTest extends TestCase
     }
 
     /** @test */
-    public function it_can_update_multiple_existing_searchable_objects()
+    public function test_it_can_update_multiple_existing_searchable_objects()
     {
         $index = $this->createDummyObjectToIndex(1);
         // This dummy object uses the same index so no need to get it from the method.
@@ -103,7 +103,7 @@ class AlgoliaManagerTest extends TestCase
     }
 
     /** @test */
-    public function it_can_remove_an_existing_searchable_object_from_indices()
+    public function test_it_can_remove_an_existing_searchable_object_from_indices()
     {
         $objectID = 1;
         $index = $this->createDummyObjectToIndex($objectID);
@@ -120,7 +120,7 @@ class AlgoliaManagerTest extends TestCase
     }
 
     /** @test */
-    public function it_can_remove_multiple_existing_searchable_objects_from_indices()
+    public function test_it_can_remove_multiple_existing_searchable_objects_from_indices()
     {
         $objectID1 = 1;
         $index = $this->createDummyObjectToIndex($objectID1);
@@ -144,7 +144,7 @@ class AlgoliaManagerTest extends TestCase
     }
 
     /** @test */
-    public function it_can_do_searches()
+    public function test_it_can_do_searches()
     {
         $activeRecord1 = new DummyActiveRecordModel();
         $activeRecord1->test = 'test';
@@ -165,7 +165,7 @@ class AlgoliaManagerTest extends TestCase
     }
 
     /** @test */
-    public function it_can_do_searches_with_additional_parameters()
+    public function test_it_can_do_searches_with_additional_parameters()
     {
         $activeRecord1 = new DummyActiveRecordModel();
         $activeRecord1->test = 'test';
@@ -187,7 +187,7 @@ class AlgoliaManagerTest extends TestCase
     }
 
     /** @test */
-    public function it_can_reindex_the_given_active_record_class()
+    public function test_it_can_reindex_the_given_active_record_class()
     {
         $activeRecord1 = new DummyActiveRecordModel();
         $activeRecord1->test = 'test';
@@ -201,7 +201,7 @@ class AlgoliaManagerTest extends TestCase
         $index = $this->algoliaManager->initIndex($indexName);
 
         // Add dummy object to the index so it exists for the reindex operation.
-        $response = $index->addObject(['dummy' => 'dummy'], 'dummy');
+        $response = $index->saveObject(['dummy' => 'dummy'], 'dummy');
         $index->waitTask($response['taskID']);
 
         $response = $this->algoliaManager->reindex(DummyActiveRecordModel::class);
@@ -214,7 +214,7 @@ class AlgoliaManagerTest extends TestCase
     }
 
     /** @test */
-    public function it_can_reindex_the_given_active_query()
+    public function test_it_can_reindex_the_given_active_query()
     {
         $activeRecord1 = new DummyActiveRecordModel();
         $activeRecord1->test = 'reindex';
@@ -230,7 +230,7 @@ class AlgoliaManagerTest extends TestCase
         $index = $this->algoliaManager->initIndex($indexName);
 
         // Add dummy object to the index so it exists for the reindex operation.
-        $response = $index->addObject(['dummy' => 'dummy'], 'dummy');
+        $response = $index->saveObject(['dummy' => 'dummy'], 'dummy');
         $index->waitTask($response['taskID']);
 
         $activeQuery = DummyActiveRecordModel::find()->where(['otherProperty' => 'indexable']);
@@ -245,7 +245,7 @@ class AlgoliaManagerTest extends TestCase
     }
 
     /** @test */
-    public function it_can_reindex_explicitly_given_searchable_objects()
+    public function test_it_can_reindex_explicitly_given_searchable_objects()
     {
         $activeRecord1 = new DummyActiveRecordModel();
         $activeRecord1->test = 'test';
@@ -259,7 +259,7 @@ class AlgoliaManagerTest extends TestCase
         $index = $this->algoliaManager->initIndex($indexName);
 
         // Add dummy object to the index so it exists for the reindex operation.
-        $response = $index->addObject(['dummy' => 'dummy'], 'dummy');
+        $response = $index->saveObject(['dummy' => 'dummy'], 'dummy');
         $index->waitTask($response['taskID']);
 
         $response = $this->algoliaManager->reindexOnly([$activeRecord1, $activeRecord2]);
@@ -272,7 +272,7 @@ class AlgoliaManagerTest extends TestCase
     }
 
     /** @test */
-    public function it_can_clear_indices_for_given_active_record_class()
+    public function test_it_can_clear_indices_for_given_active_record_class()
     {
         $activeRecord1 = new DummyActiveRecordModel();
         $activeRecord1->test = 'test';
@@ -295,7 +295,7 @@ class AlgoliaManagerTest extends TestCase
     }
 
     /** @test */
-    public function it_uses_right_index_according_to_given_env()
+    public function test_it_uses_right_index_according_to_given_env()
     {
         // Clean up.
         $this->destroyApplication();
@@ -328,7 +328,7 @@ class AlgoliaManagerTest extends TestCase
      *
      * @param int $objectId
      *
-     * @return \AlgoliaSearch\Index
+     * @return \Algolia\AlgoliaSearch\SearchIndex
      */
     private function createDummyObjectToIndex($objectId = 1)
     {
@@ -342,7 +342,7 @@ class AlgoliaManagerTest extends TestCase
      *
      * @param SearchableInterface $searchableObject
      *
-     * @return \AlgoliaSearch\Index
+     * @return \Algolia\AlgoliaSearch\SearchIndex
      */
     private function addSearchableObjectToIndex($searchableObject)
     {

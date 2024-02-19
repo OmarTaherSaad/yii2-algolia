@@ -4,29 +4,29 @@ namespace leinonen\Yii2Algolia\Tests\Unit;
 
 use Yii;
 use Mockery as m;
-use yiiunit\TestCase;
-use AlgoliaSearch\Client;
+use Algolia\AlgoliaSearch\SearchClient;
 use leinonen\Yii2Algolia\AlgoliaFactory;
 use leinonen\Yii2Algolia\AlgoliaManager;
 use leinonen\Yii2Algolia\AlgoliaComponent;
 use leinonen\Yii2Algolia\ActiveRecord\ActiveQueryChunker;
 use leinonen\Yii2Algolia\ActiveRecord\ActiveRecordFactory;
+use leinonen\Yii2Algolia\Tests\Unit\TestCase;
 
 class AlgoliaComponentTest extends TestCase
 {
     /**
-     * @var Client
+     * @var SearchClient
      */
     private $mockAlgoliaClient;
 
     private $algoliaManager;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $mockAlgoliaFactory = m::mock(AlgoliaFactory::class);
-        $this->mockAlgoliaClient = m::mock(Client::class);
+        $this->mockAlgoliaClient = m::mock(SearchClient::class);
 
         $this->algoliaManager = new AlgoliaManager(
             $this->mockAlgoliaClient,
@@ -49,7 +49,7 @@ class AlgoliaComponentTest extends TestCase
         ]);
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
 
@@ -61,35 +61,33 @@ class AlgoliaComponentTest extends TestCase
     }
 
     /** @test */
-    public function it_accessible_like_proper_yii2_component()
+    public function test_it_accessible_like_proper_yii2_component()
     {
         $this->assertInstanceOf(AlgoliaComponent::class, Yii::$app->algolia);
     }
 
     /** @test */
-    public function it_registers_AlgoliaManager_to_di_container_properly()
+    public function test_it_registers_AlgoliaManager_to_di_container_properly()
     {
         $manager = Yii::$container->get(AlgoliaManager::class);
         $this->assertInstanceOf(AlgoliaManager::class, $manager);
 
-        /** @var Client $client */
+        /** @var SearchClient $client */
         $client = $manager->getClient();
         $this->assertEquals($this->mockAlgoliaClient, $client);
     }
 
     /** @test */
-    public function it_delegates_the_methods_to_AlgoliaManager()
+    public function test_it_delegates_the_methods_to_AlgoliaManager()
     {
         $this->assertEquals($this->mockAlgoliaClient, Yii::$app->algolia->getClient());
     }
 
-    /**
-     * @test
-     * @expectedException \yii\base\InvalidConfigException
-     * @expectedExceptionMessage applicationId and apiKey are required
-     */
-    public function it_throws_an_error_if_applicationId_is_not_specified()
+
+    public function test_it_throws_an_error_if_applicationId_is_not_specified()
     {
+        $this->expectException(\yii\base\InvalidConfigException::class);
+        $this->expectExceptionMessage('applicationId and apiKey are required');
         $this->mockApplication([
             'bootstrap' => ['algolia'],
             'components' => [
@@ -101,13 +99,11 @@ class AlgoliaComponentTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     * @expectedException \yii\base\InvalidConfigException
-     * @expectedExceptionMessage applicationId and apiKey are required
-     */
-    public function it_throws_an_error_if_apiKey_is_not_specified()
+
+    public function test_it_throws_an_error_if_apiKey_is_not_specified()
     {
+        $this->expectException(\yii\base\InvalidConfigException::class);
+        $this->expectExceptionMessage('applicationId and apiKey are required');
         $this->mockApplication([
             'bootstrap' => ['algolia'],
             'components' => [

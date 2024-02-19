@@ -2,8 +2,9 @@
 
 namespace leinonen\Yii2Algolia;
 
-use AlgoliaSearch\Index;
-use AlgoliaSearch\Client;
+use Algolia\AlgoliaSearch\SearchIndex as Index;
+use Algolia\AlgoliaSearch\SearchClient;
+use Algolia\AlgoliaSearch\SearchIndex;
 use yii\db\ActiveQueryInterface;
 use leinonen\Yii2Algolia\ActiveRecord\Searchable;
 use leinonen\Yii2Algolia\ActiveRecord\ActiveQueryChunker;
@@ -31,7 +32,7 @@ use leinonen\Yii2Algolia\ActiveRecord\ActiveRecordFactory;
  * @method listUserIDs($page = 0, $hitsPerPage = 20)
  * @method getTopUserID()
  * @method searchUserIDs($query, $clusterName = null, $page = null, $hitsPerPage = null)
- * @method Index initIndex(string $indexName)
+ * @method SearchIndex initIndex(string $indexName)
  * @method mixed listApiKeys()
  * @method mixed getApiKey(string $key)
  * @method mixed deleteApiKey(string $key)
@@ -40,12 +41,12 @@ use leinonen\Yii2Algolia\ActiveRecord\ActiveRecordFactory;
  * @method mixed batch(array $requests)
  * @method string generateSecuredApiKey(string $privateApiKey, mixed $query, string $userToken = null)
  * @method string buildQuery(array $args)
- * @method mixed request(\AlgoliaSearch\ClientContext $context, string $method, string $path, array $params, array $data, array $hostsArray, int $connectTimeout, int $readTimeout)
- * @method mixed doRequest(\AlgoliaSearch\ClientContext $context, string $method, string $path, array $params, array $data, array $hostsArray, int $connectTimeout, int $readTimeout)
- * @method \AlgoliaSearch\PlacesIndex initPlaces(string $appId = null, string $appKey = null, array $hostsArray = null, array $options = [])
+ * @method mixed request(\Algolia\AlgoliaSearch\ClientContext $context, string $method, string $path, array $params, array $data, array $hostsArray, int $connectTimeout, int $readTimeout)
+ * @method mixed doRequest(\Algolia\AlgoliaSearch\ClientContext $context, string $method, string $path, array $params, array $data, array $hostsArray, int $connectTimeout, int $readTimeout)
+ * @method \Algolia\AlgoliaSearch\PlacesIndex initPlaces(string $appId = null, string $appKey = null, array $hostsArray = null, array $options = [])
  * @method getContext()
  *
- * @see Client
+ * @see SearchClient
  */
 class AlgoliaManager
 {
@@ -65,7 +66,7 @@ class AlgoliaManager
     protected $config;
 
     /**
-     * @var Client
+     * @var SearchClient
      */
     protected $client;
 
@@ -87,12 +88,12 @@ class AlgoliaManager
     /**
      * Initiates a new AlgoliaManager.
      *
-     * @param Client $client
+     * @param SearchClient $client
      * @param ActiveRecordFactory $activeRecordFactory
      * @param ActiveQueryChunker $activeQueryChunker
      */
     public function __construct(
-        Client $client,
+        SearchClient $client,
         ActiveRecordFactory $activeRecordFactory,
         ActiveQueryChunker $activeQueryChunker
     ) {
@@ -104,7 +105,7 @@ class AlgoliaManager
     /**
      * Returns the Algolia Client.
      *
-     * @return Client
+     * @return SearchClient
      */
     public function getClient()
     {
@@ -144,7 +145,7 @@ class AlgoliaManager
         $record = $searchableModel->getAlgoliaRecord();
 
         return $this->processIndices($indices, function (Index $index) use ($record, $searchableModel) {
-            return $index->addObject($record, $searchableModel->getObjectID());
+            return $index->saveObject($record, $searchableModel->getObjectID());
         });
     }
 
@@ -161,7 +162,7 @@ class AlgoliaManager
         $indices = $this->initIndices($searchableModels[0]);
 
         return $this->processIndices($indices, function (Index $index) use ($algoliaRecords) {
-            return $index->addObjects($algoliaRecords);
+            return $index->saveObjects($algoliaRecords);
         });
     }
 
@@ -381,7 +382,7 @@ class AlgoliaManager
     {
         $reflectionClass = new \ReflectionClass($class);
 
-        if (! $reflectionClass->implementsInterface(SearchableInterface::class)) {
+        if (!$reflectionClass->implementsInterface(SearchableInterface::class)) {
             throw new \InvalidArgumentException("The class: {$reflectionClass->name} doesn't implement leinonen\\Yii2Algolia\\SearchableInterface");
         }
     }
@@ -391,7 +392,7 @@ class AlgoliaManager
      *
      * @param SearchableInterface $searchableModel
      *
-     * @return Index[]
+     * @return SearchIndex[]
      */
     private function initIndices(SearchableInterface $searchableModel)
     {
@@ -424,7 +425,7 @@ class AlgoliaManager
         $this->checkImplementsSearchableInterface($arrayType);
 
         return \array_map(function (SearchableInterface $searchableModel) use ($arrayType) {
-            if (! $searchableModel instanceof $arrayType) {
+            if (!$searchableModel instanceof $arrayType) {
                 throw new \InvalidArgumentException('The given array should not contain multiple different classes');
             }
 
@@ -438,17 +439,17 @@ class AlgoliaManager
     /**
      * Reindex atomically the given index with the given records.
      *
-     * @param Index $index
+     * @param SearchIndex $index
      * @param array $algoliaRecords
      *
      * @return mixed
      */
-    private function reindexAtomically(Index $index, array $algoliaRecords)
+    private function reindexAtomically(SearchIndex $index, array $algoliaRecords)
     {
-        $temporaryIndexName = 'tmp_' . $index->indexName;
+        $temporaryIndexName = 'tmp_' . $index->getIndexName();
 
         $temporaryIndex = $this->initIndex($temporaryIndexName);
-        $temporaryIndex->addObjects($algoliaRecords);
+        $temporaryIndex->saveObjects($algoliaRecords);
 
         $settings = $index->getSettings();
 
@@ -456,13 +457,13 @@ class AlgoliaManager
         // So we need to set the original settings on the temporary one before atomically moving the index.
         $temporaryIndex->setSettings($settings);
 
-        return $this->moveIndex($temporaryIndexName, $index->indexName);
+        return $this->moveIndex($temporaryIndexName, $index->getIndexName());
     }
 
     /**
      * Performs actions for given indices returning an array of responses from those actions.
      *
-     * @param Index[] $indices
+     * @param SearchIndex[] $indices
      * @param callable $callback
      *
      * @return array The response as an array in format of ['indexName' => $responseFromAlgoliaClient]
@@ -472,7 +473,7 @@ class AlgoliaManager
         $response = [];
 
         foreach ($indices as $index) {
-            $response[$index->indexName] = \call_user_func($callback, $index);
+            $response[$index->getIndexName()] = \call_user_func($callback, $index);
         }
 
         return $response;

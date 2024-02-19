@@ -6,16 +6,17 @@ use Mockery as m;
 use yii\db\ActiveQueryInterface;
 use leinonen\Yii2Algolia\Tests\Helpers\DummyModel;
 use leinonen\Yii2Algolia\ActiveRecord\ActiveQueryChunker;
+use leinonen\Yii2Algolia\Tests\Unit\TestCase;
 
-class ActiveQueryChunkerTest extends \PHPUnit_Framework_TestCase
+class ActiveQueryChunkerTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
 
     /** @test */
-    public function it_can_chunk_the_results_from_an_active_query()
+    public function test_it_can_chunk_the_results_from_an_active_query()
     {
         $dummyModel1 = m::mock(DummyModel::class)->makePartial();
         $dummyModel1->id = 1;
@@ -53,7 +54,7 @@ class ActiveQueryChunkerTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function the_chunk_can_be_stopped_by_returning_false_from_the_callable()
+    public function test_the_chunk_can_be_stopped_by_returning_false_from_the_callable()
     {
         $dummyModel1 = m::mock(DummyModel::class)->makePartial();
         $dummyModel1->id = 1;
@@ -87,7 +88,7 @@ class ActiveQueryChunkerTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function the_result_of_the_chunks_is_merged_and_returned_as_array()
+    public function test_the_result_of_the_chunks_is_merged_and_returned_as_array()
     {
         $dummyModel1 = m::mock(DummyModel::class)->makePartial();
         $dummyModel1->id = 1;
@@ -127,7 +128,7 @@ class ActiveQueryChunkerTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function only_arrays_returned_from_callable_are_merged_into_the_results()
+    public function test_only_arrays_returned_from_callable_are_merged_into_the_results()
     {
         $dummyModel1 = m::mock(DummyModel::class)->makePartial();
         $dummyModel1->id = 1;

@@ -4,10 +4,10 @@ namespace leinonen\Yii2Algolia\Tests\Unit\ActiveRecord;
 
 use Yii;
 use Mockery as m;
-use yiiunit\TestCase;
 use leinonen\Yii2Algolia\AlgoliaManager;
 use leinonen\Yii2Algolia\AlgoliaComponent;
 use leinonen\Yii2Algolia\Tests\Helpers\DummyActiveRecordModel;
+use leinonen\Yii2Algolia\Tests\Unit\TestCase;
 
 class SearchableTest extends TestCase
 {
@@ -16,7 +16,7 @@ class SearchableTest extends TestCase
      */
     private $dummyAlgoliaManager;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->mockWebApplication([
@@ -37,21 +37,21 @@ class SearchableTest extends TestCase
         });
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
         parent::tearDown();
     }
 
     /** @test */
-    public function it_can_return_indices_for_the_model()
+    public function test_it_can_return_indices_for_the_model()
     {
         $testModel = new DummyActiveRecordModel();
         $this->assertEquals(['DummyActiveRecordModel'], $testModel->getIndices());
     }
 
     /** @test */
-    public function if_the_indices_are_specified_they_take_precedence()
+    public function test_if_the_indices_are_specified_they_take_precedence()
     {
         $testModel = m::mock(DummyActiveRecordModel::class)->makePartial();
         $testModel->shouldReceive('indices')->andReturn(['firstIndice', 'secondIndice']);
@@ -60,7 +60,7 @@ class SearchableTest extends TestCase
     }
 
     /** @test */
-    public function it_can_be_converted_to_algolia_record()
+    public function test_it_can_be_converted_to_algolia_record()
     {
         $testModel = m::mock(DummyActiveRecordModel::class)->makePartial();
         $testModel->shouldReceive('toArray')->andReturn(['property1' => 'test']);
@@ -69,7 +69,7 @@ class SearchableTest extends TestCase
     }
 
     /** @test */
-    public function it_can_be_pushed_to_indices()
+    public function test_it_can_be_pushed_to_indices()
     {
         $testModel = m::mock(DummyActiveRecordModel::class)->makePartial();
         $this->dummyAlgoliaManager->shouldReceive('pushToIndices')
@@ -82,7 +82,7 @@ class SearchableTest extends TestCase
     }
 
     /** @test */
-    public function it_can_be_removed_from_indices()
+    public function test_it_can_be_removed_from_indices()
     {
         $testModel = m::mock(DummyActiveRecordModel::class)->makePartial();
         $this->dummyAlgoliaManager->shouldReceive('removeFromIndices')
@@ -95,7 +95,7 @@ class SearchableTest extends TestCase
     }
 
     /** @test */
-    public function it_can_be_updated_in_indices()
+    public function test_it_can_be_updated_in_indices()
     {
         $testModel = m::mock(DummyActiveRecordModel::class)->makePartial();
         $this->dummyAlgoliaManager->shouldReceive('updateInIndices')
@@ -108,7 +108,7 @@ class SearchableTest extends TestCase
     }
 
     /** @test */
-    public function it_uses_the_primary_key_of_the_active_record_for_the_object_id()
+    public function test_it_uses_the_primary_key_of_the_active_record_for_the_object_id()
     {
         $testModel = m::mock(DummyActiveRecordModel::class)->makePartial();
         $testModel->shouldReceive('getPrimaryKey')->andReturn(1);
@@ -117,7 +117,7 @@ class SearchableTest extends TestCase
     }
 
     /** @test */
-    public function it_can_be_re_indexed()
+    public function test_it_can_be_re_indexed()
     {
         $this->dummyAlgoliaManager->shouldReceive('reindex')
             ->once()
@@ -129,7 +129,7 @@ class SearchableTest extends TestCase
     }
 
     /** @test */
-    public function it_can_be_cleared_from_indices()
+    public function test_it_can_be_cleared_from_indices()
     {
         $this->dummyAlgoliaManager->shouldReceive('clearIndices')
             ->once()
@@ -141,7 +141,7 @@ class SearchableTest extends TestCase
     }
 
     /** @test */
-    public function it_can_be_searched()
+    public function test_it_can_be_searched()
     {
         $this->dummyAlgoliaManager->shouldReceive('search')
             ->once()
@@ -153,7 +153,7 @@ class SearchableTest extends TestCase
     }
 
     /** @test */
-    public function it_can_be_searched_with_addittional_search_parameters()
+    public function test_it_can_be_searched_with_addittional_search_parameters()
     {
         $searchParameters = ['attributesToRetrieve' => 'firstname,lastname', 'hitsPerPage' => 50];
         $this->dummyAlgoliaManager->shouldReceive('search')

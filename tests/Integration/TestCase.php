@@ -6,12 +6,13 @@ use Yii;
 use yii\db\Schema;
 use yii\db\Connection;
 use leinonen\Yii2Algolia\AlgoliaComponent;
+use leinonen\Yii2Algolia\Tests\Unit\TestCase as UnitTestCase;
 
-class TestCase extends \yiiunit\TestCase
+class TestCase extends UnitTestCase
 {
     protected $databaseConfig;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $dsn = getenv('DB_DRIVER') . ':host=' . getenv('DB_HOST') . ';dbname=' . getenv('DB_NAME');
 

@@ -4,13 +4,13 @@ namespace leinonen\Yii2Algolia;
 
 use Yii;
 use yii\base\Component;
-use AlgoliaSearch\Client;
+use Algolia\AlgoliaSearch\SearchClient;
 use yii\base\Application;
 use yii\base\BootstrapInterface;
 use yii\base\InvalidConfigException;
 
 /**
- * @method Client getClient()
+ * @method SearchClient getClient()
  * @method array getConfig()
  * @method pushToIndices(SearchableInterface $searchableModel)
  * @method updateInIndices(SearchableInterface $searchableModel)
@@ -38,7 +38,7 @@ use yii\base\InvalidConfigException;
  * @method listUserIDs($page = 0, $hitsPerPage = 20)
  * @method getTopUserID()
  * @method searchUserIDs($query, $clusterName = null, $page = null, $hitsPerPage = null)
- * @method \AlgoliaSearch\Index initIndex(string $indexName)
+ * @method \Algolia\AlgoliaSearch\SearchIndex initIndex(string $indexName)
  * @method mixed listApiKeys()
  * @method mixed getApiKey(string $key)
  * @method mixed deleteApiKey(string $key)
@@ -47,11 +47,11 @@ use yii\base\InvalidConfigException;
  * @method mixed batch(array $requests)
  * @method string generateSecuredApiKey(string $privateApiKey, mixed $query, string $userToken = null)
  * @method string buildQuery(array $args)
- * @method mixed request(\AlgoliaSearch\ClientContext $context, string $method, string $path, array $params, array $data, array $hostsArray, int $connectTimeout, int $readTimeout)
- * @method mixed doRequest(\AlgoliaSearch\ClientContext $context, string $method, string $path, array $params, array $data, array $hostsArray, int $connectTimeout, int $readTimeout)
- * @method \AlgoliaSearch\PlacesIndex initPlaces(string $appId = null, string $appKey = null, array $hostsArray = null, array $options = [])
+ * @method mixed request(\Algolia\AlgoliaSearch\ClientContext $context, string $method, string $path, array $params, array $data, array $hostsArray, int $connectTimeout, int $readTimeout)
+ * @method mixed doRequest(\Algolia\AlgoliaSearch\ClientContext $context, string $method, string $path, array $params, array $data, array $hostsArray, int $connectTimeout, int $readTimeout)
+ * @method \Algolia\AlgoliaSearch\PlacesIndex initPlaces(string $appId = null, string $appKey = null, array $hostsArray = null, array $options = [])
  * @method getContext()
- * @see Client
+ * @see SearchClient
  * @see AlgoliaManager
  */
 class AlgoliaComponent extends Component implements BootstrapInterface
